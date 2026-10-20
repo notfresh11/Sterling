@@ -28,23 +28,31 @@ dependencies {
     modImplementation 'net.fabricmc.fabric-api:fabric-api:0.97.0+1.20.4'
 
     // Gson for JSON handling
-    implementation 'com.google.code.gson:gson:2.10.1'
+    include implementation('com.google.code.gson:gson:2.10.1')
 
     // SnakeYAML for configuration
-    implementation 'org.yaml:snakeyaml:2.2'
+    include implementation('org.yaml:snakeyaml:2.2')
 
     // Testing dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 }
 
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.toVersion(25)
+    targetCompatibility = JavaVersion.toVersion(25)
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 test {
