@@ -5,10 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 import net.sterling.bridge.config.SterlingConfig;
 import net.sterling.bridge.manifest.ManifestGenerator;
 import net.sterling.bridge.manifest.ManifestModel;
+import net.sterling.bridge.util.TextHelper;
 
 import java.nio.file.Path;
 
@@ -43,7 +43,7 @@ public class SterlingCommand {
         ManifestModel manifest = manifestGenerator.generateAndSaveManifest();
 
         if (context != null && context.getSource() != null) {
-            context.getSource().sendFeedback(() -> Text.literal("§a[Sterling] Config reloaded and manifest regenerated successfully!"), false);
+            TextHelper.sendFeedback(context.getSource(), "§a[Sterling] Config reloaded and manifest regenerated successfully!");
         }
         return 1;
     }
@@ -53,7 +53,7 @@ public class SterlingCommand {
         int modCount = manifest.getMods().size();
 
         if (context != null && context.getSource() != null) {
-            context.getSource().sendFeedback(() -> Text.literal("§a[Sterling] Scanned and synced " + modCount + " mods with Modrinth API."), false);
+            TextHelper.sendFeedback(context.getSource(), "§a[Sterling] Scanned and synced " + modCount + " mods with Modrinth API.");
         }
         return 1;
     }
@@ -64,10 +64,10 @@ public class SterlingCommand {
             int httpPort = config.getHttpPort();
             int modSourcesCount = config.getModSources().size();
 
-            context.getSource().sendFeedback(() -> Text.literal("§b--- Sterling's Bridge Status ---"), false);
-            context.getSource().sendFeedback(() -> Text.literal("§7HTTP Embedded Server: " + (httpActive ? "§aActive (Port " + httpPort + ")" : "§cDisabled")), false);
-            context.getSource().sendFeedback(() -> Text.literal("§7Mapped Mod Sources: §e" + modSourcesCount), false);
-            context.getSource().sendFeedback(() -> Text.literal("§7Minecraft Version: §a26.3 / Fabric"), false);
+            TextHelper.sendFeedback(context.getSource(), "§b--- Sterling's Bridge Status ---");
+            TextHelper.sendFeedback(context.getSource(), "§7HTTP Embedded Server: " + (httpActive ? "§aActive (Port " + httpPort + ")" : "§cDisabled"));
+            TextHelper.sendFeedback(context.getSource(), "§7Mapped Mod Sources: §e" + modSourcesCount);
+            TextHelper.sendFeedback(context.getSource(), "§7Minecraft Version: §a26.3 / Fabric");
         }
         return 1;
     }

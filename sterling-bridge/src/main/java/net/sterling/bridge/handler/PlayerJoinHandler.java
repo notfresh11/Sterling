@@ -1,9 +1,8 @@
 package net.sterling.bridge.handler;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.sterling.bridge.config.SterlingConfig;
+import net.sterling.bridge.util.TextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,34 +16,65 @@ public class PlayerJoinHandler {
 
     public void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            String playerName = player.getName().getString();
+            Object player = handler.getPlayer();
+            String playerName = getPlayerName(player);
 
             // Perform client/brand check or sterling handshake verification
             boolean isSterlingClient = checkIsSterlingClient(player);
 
             if (!isSterlingClient) {
                 LOGGER.info("Player {} connected without Sterling Launcher. Disconnecting...", playerName);
-                String kickText = formatKickMessage(player);
-                handler.disconnect(Text.literal(kickText));
+                String kickText = formatKickMessage(player, playerName);
+                TextHelper.disconnectPlayer(handler, kickText);
             } else {
                 LOGGER.info("Player {} verified with Sterling Launcher.", playerName);
             }
         });
     }
 
-    private boolean checkIsSterlingClient(ServerPlayerEntity player) {
+    private boolean checkIsSterlingClient(Object player) {
         // In actual network packet processing, inspect custom channel / brand.
         // For standard vanilla players connecting directly without custom Sterling protocol handshake, return false.
         return false;
     }
 
-    public String formatKickMessage(ServerPlayerEntity player) {
-        String serverIp = player.getServer() != null ? player.getServer().getServerIp() : "127.0.0.1";
-        if (serverIp == null || serverIp.isBlank()) {
-            serverIp = "127.0.0.1";
+    private String getPlayerName(Object player) {
+        if (player == null) return "Unknown";
+        try {
+            Object nameObj = player.getClass().getMethod("getName").invoke(player);
+            if (nameObj != null) {
+                try {
+                    Object strObj = nameObj.getClass().getMethod("getString").invoke(nameObj);
+                    if (strObj != null) return strObj.toString();
+                } catch (Exception ignored) {
+                }
+                return nameObj.toString();
+            }
+        } catch (Exception ignored) {
         }
-        int serverPort = player.getServer() != null ? player.getServer().getServerPort() : 25565;
+        return "Player";
+    }
+
+    public String formatKickMessage(Object player, String playerName) {
+        String serverIp = "127.0.0.1";
+        int serverPort = 25565;
+
+        if (player != null) {
+            try {
+                Object serverObj = player.getClass().getMethod("getServer").invoke(player);
+                if (serverObj != null) {
+                    Object ipObj = serverObj.getClass().getMethod("getServerIp").invoke(serverObj);
+                    if (ipObj != null && !ipObj.toString().isBlank()) {
+                        serverIp = ipObj.toString();
+                    }
+                    Object portObj = serverObj.getClass().getMethod("getServerPort").invoke(serverObj);
+                    if (portObj instanceof Integer) {
+                        serverPort = (Integer) portObj;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
 
         String manifestUrl = config.getCustomManifestUrl();
         if (manifestUrl == null || manifestUrl.isBlank()) {
@@ -60,6 +90,6 @@ public class PlayerJoinHandler {
                 .replace("{manifest_url}", manifestUrl)
                 .replace("{download_url}", config.getLauncherDownloadUrl())
                 .replace("{sterling_uri}", sterlingUri)
-                .replace("{player_name}", player.getName().getString());
+                .replace("{player_name}", playerName);
     }
 }
