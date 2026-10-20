@@ -1,0 +1,14 @@
+.gradle/
+build/
+bin/
+out/
+logs/
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.ds_store
+sterling-bridge/.gradle/
+sterling-bridge/build/
+sterling-bridge/logs/
