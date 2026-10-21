@@ -19,25 +19,22 @@ repositories {
 }
 
 dependencies {
-    // Fabric Loom / Loader / API dependencies
     minecraft 'com.mojang:minecraft:26.3'
-    mappings loom.officialMojangMappings()
-    modImplementation 'net.fabricmc:fabric-loader:0.16.10'
+    
+    // Folosim Yarn Mappings oficiale de Fabric pentru 26.3
+    mappings "net.fabricmc:yarn:26.3+build.1:v2"
 
-    // Fabric API
-    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.100.0+26.3'
+    modImplementation 'net.fabricmc:fabric-loader:0.19.5'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.164.0+26.3'
 
-    // Gson for JSON handling
     include implementation('com.google.code.gson:gson:2.10.1')
-
-    // SnakeYAML for configuration
     include implementation('org.yaml:snakeyaml:2.2')
 
-    // Testing dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
 
 processResources {
     inputs.property "version", project.version
