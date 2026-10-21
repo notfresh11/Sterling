@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'fabric-loom' version '1.8.11'
+    id 'fabric-loom' version '1.19-SNAPSHOT'
 }
 
 rootProject.name = "sterling-bridge"
