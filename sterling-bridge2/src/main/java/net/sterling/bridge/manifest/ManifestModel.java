@@ -9,6 +9,7 @@ public class ManifestModel {
     private String loaderType;
     private String loaderVersion;
     private String generatedAt;
+    private String modpackDownloadLink;
     private List<ModEntry> mods = new ArrayList<>();
 
     public ManifestModel() {}
@@ -35,6 +36,9 @@ public class ManifestModel {
 
     public String getGeneratedAt() { return generatedAt; }
     public void setGeneratedAt(String generatedAt) { this.generatedAt = generatedAt; }
+
+    public String getModpackDownloadLink() { return modpackDownloadLink; }
+    public void setModpackDownloadLink(String modpackDownloadLink) { this.modpackDownloadLink = modpackDownloadLink; }
 
     public List<ModEntry> getMods() { return mods; }
     public void setMods(List<ModEntry> mods) { this.mods = mods; }

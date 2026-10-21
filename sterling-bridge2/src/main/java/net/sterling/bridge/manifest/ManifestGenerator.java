@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,16 +39,27 @@ public class ManifestGenerator {
         manifest.setServerName(config.getServerName());
         manifest.setMinecraftVersion("26.3");
         manifest.setLoaderType("fabric");
-        manifest.setLoaderVersion("0.16.10");
+        manifest.setLoaderVersion("0.19.5");
         manifest.setGeneratedAt(Instant.now().toString());
+        if (config.isModpack()) {
+            manifest.setModpackDownloadLink(config.getModpackDownloadLink());
+        }
 
         List<ManifestModel.ModEntry> modEntries = new ArrayList<>();
+        List<String> excludedMods = config.getExcludedMods().stream()
+                .map(name -> name.toLowerCase(Locale.ROOT))
+                .toList();
 
-        if (Files.exists(modsDir) && Files.isDirectory(modsDir)) {
+        if (!config.isModpack() && Files.exists(modsDir) && Files.isDirectory(modsDir)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(modsDir, "*.jar")) {
                 for (Path entry : stream) {
                     if (Files.isRegularFile(entry)) {
                         String fileName = entry.getFileName().toString();
+                        String modId = fileName.substring(0, fileName.length() - ".jar".length());
+                        if (excludedMods.contains(fileName.toLowerCase(Locale.ROOT))
+                                || excludedMods.contains(modId.toLowerCase(Locale.ROOT))) {
+                            continue;
+                        }
                         String sha256 = HashUtils.calculateSHA256(entry);
 
                         String downloadUrl = null;
@@ -70,7 +82,7 @@ public class ManifestGenerator {
                                 fileName,
                                 sha256,
                                 downloadUrl,
-                                fileName.replace(".jar", ""),
+                                modId,
                                 "1.0.0"
                         );
                         modEntries.add(modEntry);

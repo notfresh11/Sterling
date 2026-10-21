@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b0e" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <title>Sterling Launcher</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Sterling Launcher home">
+          <span class="brand-mark">S</span>
+          <span class="brand-name">STERLING<span>LAUNCHER</span></span>
+        </a>
+
+        <div class="nav-label">LIBRARY</div>
+        <nav class="side-nav" aria-label="Main navigation">
+          <button class="nav-item active" type="button" data-page="play" aria-current="page">
+            <span class="nav-icon">▶</span>
+            <span>Play</span>
+          </button>
+          <button class="nav-item" type="button" data-page="instances">
+            <span class="nav-icon">▦</span>
+            <span>Instances</span>
+          </button>
+        </nav>
+        <div class="nav-label preferences-label">PREFERENCES</div>
+        <nav class="side-nav" aria-label="Preferences">
+          <button class="nav-item" type="button" data-page="settings">
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="profile-card">
+            <div class="profile-avatar" id="profile-avatar">?</div>
+            <div class="profile-copy">
+              <span class="profile-name" id="profile-name">Not signed in</span>
+              <span class="profile-subtitle" id="profile-subtitle">Microsoft account</span>
+            </div>
+            <span class="online-dot"></span>
+          </div>
+          <div class="sidebar-version">STERLING LAUNCHER <span>0.1.0</span></div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumb" id="breadcrumb">LIBRARY <span>/</span> PLAY</div>
+          <div class="account-status"><span class="status-dot"></span><span id="account-status-label">ACCOUNT NOT CONNECTED</span></div>
+        </header>
+        <div id="app-notice" class="prototype-notice app-notice" role="status" hidden></div>
+
+        <section class="page" id="page-play">
+        <section class="welcome-section">
+          <div class="eyebrow"><span></span> MODDED MINECRAFT, SIMPLIFIED</div>
+          <h1>Your next world<br />is <span>closer than ever.</span></h1>
+          <p class="welcome-copy">Connect to a Sterling server. We’ll help prepare the right mods for your game.</p>
+        </section>
+
+        <section class="connect-card" aria-labelledby="connect-title">
+          <div class="card-heading">
+            <div class="card-icon">↗</div>
+            <div>
+              <h2 id="connect-title">Connect to a server</h2>
+              <p>Paste the Sterling connection link provided by the server.</p>
+            </div>
+          </div>
+
+          <form id="connect-form">
+            <label for="server-link">STERLING CONNECTION LINK</label>
+            <div class="input-row">
+              <input
+                id="server-link"
+                name="server-link"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="sterling://connect?ip=play.example.com&port=25565&manifest=..."
+              />
+              <button class="primary-button" type="submit">
+                <span>Validate link</span><span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </form>
+
+          <div id="link-feedback" class="feedback" role="status" aria-live="polite">
+            <span class="feedback-symbol">i</span>
+            <span>Paste a server link to check its connection details.</span>
+          </div>
+
+          <div id="server-details" class="server-details" hidden>
+            <div class="detail-heading"><span class="detail-indicator"></span> SERVER LINK RECOGNIZED</div>
+            <div class="detail-grid">
+              <div><span>SERVER ADDRESS</span><strong id="server-address"></strong></div>
+              <div><span>MANIFEST</span><strong id="manifest-address"></strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="setup-grid">
+          <article class="setup-card account-card">
+            <div class="step-number">01</div>
+            <div class="setup-content">
+              <div class="setup-topline"><span class="step-state pending"></span> ACCOUNT</div>
+              <h3>Sign in with Microsoft</h3>
+              <p>Connect the Microsoft account that owns Minecraft Java Edition.</p>
+              <button class="secondary-button" type="button" id="microsoft-sign-in">
+                Sign in with Microsoft <span aria-hidden="true">↗</span>
+              </button>
+              <div class="setup-note" id="microsoft-account-note">Sign in with the Microsoft account that owns Minecraft Java Edition.</div>
+            </div>
+          </article>
+
+          <article class="setup-card instance-card">
+            <div class="step-number">02</div>
+            <div class="setup-content">
+              <div class="setup-topline"><span class="step-state pending"></span> GAME INSTANCE</div>
+              <h3>Ready your instance</h3>
+              <p>Create separate Vanilla, Fabric, or Forge profiles and keep their game files isolated.</p>
+              <button class="secondary-button" type="button" data-open-instances>
+                View instances <span aria-hidden="true">→</span>
+              </button>
+              <div class="setup-note">Vanilla files can be installed per instance. Game launch and Fabric/Forge installation are not connected yet.</div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="page" id="page-instances" hidden>
+          <section class="page-heading">
+            <div>
+              <div class="eyebrow"><span></span> YOUR GAME PROFILES</div>
+              <h1>Every world,<br /><span>its own instance.</span></h1>
+              <p class="welcome-copy">Keep versions, loaders, and server setups separate.</p>
+            </div>
+            <button class="primary-button create-instance-button" type="button" id="create-instance">
+              <span aria-hidden="true">+</span><span>New instance</span>
+            </button>
+          </section>
+          <div class="prototype-notice" role="note">
+            <span class="notice-icon">i</span>
+            <span>Vanilla installs into a separate Sterling folder. Fabric and Forge installers are not connected yet.</span>
+          </div>
+          <div id="instance-list" class="instance-list" aria-live="polite"></div>
+        </section>
+
+        <section class="page" id="page-settings" hidden>
+          <section class="page-heading">
+            <div>
+              <div class="eyebrow"><span></span> PERSONALIZE YOUR LAUNCHER</div>
+              <h1>Launcher<br /><span>settings.</span></h1>
+              <p class="welcome-copy">Choose how much of Minecraft’s version history to show.</p>
+            </div>
+          </section>
+          <section class="settings-card" aria-labelledby="version-settings-title">
+            <div class="settings-copy">
+              <div class="settings-icon">⌘</div>
+              <div>
+                <h2 id="version-settings-title">Show experimental versions</h2>
+                <p>Allow snapshot, alpha, and beta versions in the instance creator. These versions may be unstable and may not support every loader.</p>
+              </div>
+            </div>
+            <label class="toggle-control" for="experimental-versions">
+              <span class="visually-hidden">Show experimental versions</span>
+              <input id="experimental-versions" type="checkbox" />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+          </section>
+          <p class="settings-note">Fabric and Forge compatibility is checked against their official catalogs. Vanilla files can be installed; Java setup and game launch are not connected yet.</p>
+        </section>
+
+        <footer class="footer">
+          <span>BUILT FOR THE MODDED MINECRAFT COMMUNITY</span>
+          <span class="footer-right"><span class="footer-dot"></span> EARLY DEVELOPMENT</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="instance-dialog" class="instance-dialog">
+      <form id="instance-form" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <div class="eyebrow"><span></span> NEW PROFILE</div>
+            <h2>Create an instance</h2>
+          </div>
+          <button class="dialog-close" type="button" id="close-instance-dialog" aria-label="Close">×</button>
+        </div>
+        <label class="field-label" for="instance-name">INSTANCE NAME</label>
+        <input class="text-field" id="instance-name" name="instance-name" maxlength="40" required placeholder="e.g. Survival with friends" />
+        <label class="field-label" for="minecraft-version">MINECRAFT VERSION</label>
+        <select class="text-field" id="minecraft-version" name="minecraft-version" required disabled>
+          <option value="">Load Minecraft versions</option>
+        </select>
+        <div class="catalog-status-row">
+          <p class="field-hint" id="version-catalog-status" role="status" aria-live="polite">Versions are loaded from Mojang’s official catalog.</p>
+          <button class="catalog-retry" type="button" id="retry-version-catalog" hidden>Retry</button>
+        </div>
+        <label class="field-label" for="loader-type">GAME LOADER</label>
+        <select class="text-field" id="loader-type" name="loader-type">
+          <option value="Vanilla">Vanilla</option>
+          <option value="Fabric">Fabric</option>
+          <option value="Forge">Forge</option>
+        </select>
+        <div id="loader-build-container" hidden>
+          <label class="field-label" for="loader-build" id="loader-build-label">LOADER VERSION</label>
+          <select class="text-field" id="loader-build" name="loader-build" disabled>
+            <option value="">Choose a Minecraft version first</option>
+          </select>
+          <div class="catalog-status-row">
+            <p class="field-hint" id="loader-catalog-status" role="status" aria-live="polite">Choose a Minecraft version to check loader compatibility.</p>
+            <button class="catalog-retry" type="button" id="retry-loader-catalog" hidden>Retry</button>
+          </div>
+        </div>
+        <label class="field-label" for="version-kind">VERSION CHANNEL</label>
+        <select class="text-field" id="version-kind" name="version-kind">
+          <option value="release">Release</option>
+          <option value="snapshot" data-experimental hidden disabled>Snapshot</option>
+          <option value="alpha" data-experimental hidden disabled>Alpha</option>
+          <option value="beta" data-experimental hidden disabled>Beta</option>
+        </select>
+        <div id="instance-form-error" class="form-error" role="alert" hidden></div>
+        <div class="dialog-actions">
+          <button class="secondary-button dialog-cancel" type="button" id="cancel-instance-dialog">Cancel</button>
+          <button class="primary-button" type="submit">Create profile <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

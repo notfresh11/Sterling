@@ -4,7 +4,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.sterling.bridge.command.SterlingCommand;
 import net.sterling.bridge.config.SterlingConfig;
-import net.sterling.bridge.handler.PlayerJoinHandler;
 import net.sterling.bridge.http.EmbeddedHttpServer;
 import net.sterling.bridge.manifest.ManifestGenerator;
 import net.sterling.bridge.service.ModrinthService;
@@ -25,14 +24,15 @@ public class SterlingBridgeMod implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Initializing Sterling's Bridge Mod 2 (MC 26.3 / Fabric / Java 25)...");
 
+        Path configPath = getConfigPath();
+        Path configDir = configPath.getParent();
         Path gameDir = FabricLoader.getInstance().getGameDir();
-        Path configDir = gameDir.resolve("config").resolve("sterling");
-        Path configPath = configDir.resolve("sterling.yml");
         Path modsDir = gameDir.resolve("mods");
         Path manifestPath = configDir.resolve("manifest.json");
 
         // Load Configuration
         config = SterlingConfig.load(configPath);
+        config.validate();
 
         // Modrinth API lookup service
         ModrinthService modrinthService = new ModrinthService();
@@ -48,13 +48,17 @@ public class SterlingBridgeMod implements ModInitializer {
         }
 
         // Event Handlers
-        PlayerJoinHandler joinHandler = new PlayerJoinHandler(config);
-        joinHandler.register();
-
         // Admin Command (/sterling reload, /sterling sync, /sterling status)
         SterlingCommand command = new SterlingCommand(config, manifestGenerator, configPath);
         command.register();
 
         LOGGER.info("Sterling's Bridge Mod 2 successfully initialized!");
+    }
+
+    static Path getConfigPath() {
+        return FabricLoader.getInstance().getGameDir()
+                .resolve("config")
+                .resolve("sterling")
+                .resolve("sterling.yml");
     }
 }

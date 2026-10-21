@@ -13,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,10 +25,12 @@ public class ManifestAndHttpServerTest {
         Files.createDirectories(modsDir);
         Path dummyMod = modsDir.resolve("testmod.jar");
         Files.writeString(dummyMod, "dummy jar content");
+        Files.writeString(modsDir.resolve("server-only.jar"), "server-only jar");
 
         Path manifestPath = tempDir.resolve("manifest.json");
         SterlingConfig config = new SterlingConfig();
         config.setPublicBaseUrl("http://127.0.0.1:18080");
+        config.setExcludedMods(List.of("server-only"));
 
         ManifestGenerator generator = new ManifestGenerator(modsDir, manifestPath, config, null);
         ManifestModel manifest = generator.generateAndSaveManifest();
@@ -35,6 +38,7 @@ public class ManifestAndHttpServerTest {
         assertNotNull(manifest);
         assertEquals("26.3", manifest.getMinecraftVersion());
         assertEquals("fabric", manifest.getLoaderType());
+        assertEquals("0.19.5", manifest.getLoaderVersion());
         assertEquals(1, manifest.getMods().size());
         assertEquals("testmod.jar", manifest.getMods().get(0).getFileName());
 
@@ -53,6 +57,7 @@ public class ManifestAndHttpServerTest {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             assertTrue(response.body().contains("testmod.jar"));
+            assertFalse(response.body().contains("server-only.jar"));
 
             HttpRequest modRequest = HttpRequest.newBuilder()
                     .uri(URI.create("http://127.0.0.1:18080/mods/testmod.jar"))
@@ -65,5 +70,21 @@ public class ManifestAndHttpServerTest {
         } finally {
             server.stop();
         }
+    }
+
+    @Test
+    public void modpackModeDoesNotIncludeModsFolderEntries(@TempDir Path tempDir) throws Exception {
+        Path modsDir = Files.createDirectory(tempDir.resolve("mods"));
+        Files.writeString(modsDir.resolve("server.jar"), "server mod");
+        SterlingConfig config = new SterlingConfig();
+        config.setModpack(true);
+        config.setModpackDownloadLink("https://cdn.modrinth.com/data/abc/versions/1/pack.mrpack");
+
+        ManifestModel manifest = new ManifestGenerator(modsDir, tempDir.resolve("manifest.json"), config, null)
+                .generateAndSaveManifest();
+
+        assertTrue(manifest.getMods().isEmpty());
+        assertEquals("https://cdn.modrinth.com/data/abc/versions/1/pack.mrpack",
+                manifest.getModpackDownloadLink());
     }
 }

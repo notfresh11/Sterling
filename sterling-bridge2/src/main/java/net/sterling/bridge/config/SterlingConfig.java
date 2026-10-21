@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class SterlingConfig {
@@ -18,8 +21,12 @@ public class SterlingConfig {
     private boolean enableHttpServer = true;
     private int httpPort = 8080;
     private String publicBaseUrl = "http://127.0.0.1:8080";
+    private String launcherDownloadUrl = "https://sterling.net/download";
     private String kickMessage = "&c[Sterling Bridge]\n&7You need Sterling Launcher to join this modded server!\n&eClick to sync mods: &b{uri_protocol}\n&eDirect download: &a{download_url}";
     private String uriProtocol = "sterling://connect?ip={server_ip}&port={server_port}&manifest={manifest_url}";
+    private List<String> excludedMods = new ArrayList<>();
+    private boolean modpack;
+    private String modpackDownloadLink = "";
 
     public static SterlingConfig load(Path configPath) {
         SterlingConfig config = new SterlingConfig();
@@ -36,14 +43,32 @@ public class SterlingConfig {
             try (InputStream is = Files.newInputStream(configPath)) {
                 Map<String, Object> data = yaml.load(is);
                 if (data != null) {
-                    if (data.containsKey("serverName")) config.setServerName(String.valueOf(data.get("serverName")));
-                    if (data.containsKey("serverIp")) config.setServerIp(String.valueOf(data.get("serverIp")));
-                    if (data.containsKey("serverPort")) config.setServerPort(((Number) data.get("serverPort")).intValue());
-                    if (data.containsKey("enableHttpServer")) config.setEnableHttpServer((Boolean) data.get("enableHttpServer"));
-                    if (data.containsKey("httpPort")) config.setHttpPort(((Number) data.get("httpPort")).intValue());
-                    if (data.containsKey("publicBaseUrl")) config.setPublicBaseUrl(String.valueOf(data.get("publicBaseUrl")));
-                    if (data.containsKey("kickMessage")) config.setKickMessage(String.valueOf(data.get("kickMessage")));
-                    if (data.containsKey("uriProtocol")) config.setUriProtocol(String.valueOf(data.get("uriProtocol")));
+                    Object value = get(data, "serverName", "server-name");
+                    if (value != null) config.setServerName(String.valueOf(value));
+                    value = get(data, "serverIp", "server-ip");
+                    if (value != null) config.setServerIp(String.valueOf(value));
+                    value = get(data, "serverPort", "server-port");
+                    if (value instanceof Number number) config.setServerPort(number.intValue());
+                    value = get(data, "enableHttpServer", "enable-http-server");
+                    if (value instanceof Boolean enabled) config.setEnableHttpServer(enabled);
+                    value = get(data, "httpPort", "http-port");
+                    if (value instanceof Number number) config.setHttpPort(number.intValue());
+                    value = get(data, "publicBaseUrl", "custom-manifest-url");
+                    if (value != null && !String.valueOf(value).isBlank()) config.setPublicBaseUrl(String.valueOf(value));
+                    value = get(data, "launcherDownloadUrl", "launcher-download-url");
+                    if (value != null && !String.valueOf(value).isBlank()) config.setLauncherDownloadUrl(String.valueOf(value));
+                    value = get(data, "kickMessage", "kick-message");
+                    if (value != null) config.setKickMessage(String.valueOf(value));
+                    value = get(data, "uriProtocol", "uri-protocol");
+                    if (value != null) config.setUriProtocol(String.valueOf(value));
+                    value = get(data, "excludedMods", "excluded-mods");
+                    if (value instanceof List<?> list) {
+                        config.setExcludedMods(list.stream().map(String::valueOf).toList());
+                    }
+                    value = get(data, "modpack", "modpack-enabled");
+                    if (value instanceof Boolean enabled) config.setModpack(enabled);
+                    value = get(data, "modpack-download-link", "modpackDownloadLink");
+                    if (value != null) config.setModpackDownloadLink(String.valueOf(value));
                 }
             }
         } catch (Exception e) {
@@ -66,8 +91,12 @@ public class SterlingConfig {
             data.put("enableHttpServer", enableHttpServer);
             data.put("httpPort", httpPort);
             data.put("publicBaseUrl", publicBaseUrl);
+            data.put("launcherDownloadUrl", launcherDownloadUrl);
             data.put("kickMessage", kickMessage);
             data.put("uriProtocol", uriProtocol);
+            data.put("excludedMods", excludedMods);
+            data.put("modpack", modpack);
+            data.put("modpack-download-link", modpackDownloadLink);
 
             try (OutputStream os = Files.newOutputStream(configPath)) {
                 yaml.dump(data, new java.io.OutputStreamWriter(os));
@@ -75,6 +104,10 @@ public class SterlingConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static Object get(Map<String, Object> data, String currentKey, String legacyKey) {
+        return data.containsKey(currentKey) ? data.get(currentKey) : data.get(legacyKey);
     }
 
     public String getServerName() { return serverName; }
@@ -95,9 +128,50 @@ public class SterlingConfig {
     public String getPublicBaseUrl() { return publicBaseUrl; }
     public void setPublicBaseUrl(String publicBaseUrl) { this.publicBaseUrl = publicBaseUrl; }
 
+    public String getLauncherDownloadUrl() { return launcherDownloadUrl; }
+    public void setLauncherDownloadUrl(String launcherDownloadUrl) { this.launcherDownloadUrl = launcherDownloadUrl; }
+
     public String getKickMessage() { return kickMessage; }
     public void setKickMessage(String kickMessage) { this.kickMessage = kickMessage; }
 
     public String getUriProtocol() { return uriProtocol; }
     public void setUriProtocol(String uriProtocol) { this.uriProtocol = uriProtocol; }
+
+    public List<String> getExcludedMods() { return List.copyOf(excludedMods); }
+    public void setExcludedMods(List<String> excludedMods) {
+        this.excludedMods = excludedMods == null ? new ArrayList<>() : new ArrayList<>(excludedMods);
+    }
+
+    public boolean isModpack() { return modpack; }
+    public void setModpack(boolean modpack) { this.modpack = modpack; }
+
+    public String getModpackDownloadLink() { return modpackDownloadLink; }
+    public void setModpackDownloadLink(String modpackDownloadLink) {
+        this.modpackDownloadLink = modpackDownloadLink == null ? "" : modpackDownloadLink.strip();
+    }
+
+    public void validate() {
+        if (!modpack) {
+            return;
+        }
+        URI link;
+        try {
+            link = URI.create(modpackDownloadLink);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("modpack-download-link is not a valid direct Modrinth .mrpack URL.",
+                    exception);
+        }
+        String host = link.getHost();
+        String path = link.getPath();
+        if (host != null && (host.toLowerCase(java.util.Locale.ROOT).contains("curseforge")
+                || host.toLowerCase(java.util.Locale.ROOT).contains("forgecdn"))) {
+            throw new IllegalArgumentException(
+                    "CurseForge modpacks are not supported yet. Use a direct Modrinth .mrpack link.");
+        }
+        if (!"https".equalsIgnoreCase(link.getScheme()) || host == null || path == null
+                || !path.toLowerCase(java.util.Locale.ROOT).endsWith(".mrpack")) {
+            throw new IllegalArgumentException(
+                    "modpack-download-link must be a direct HTTPS link to a Modrinth .mrpack file.");
+        }
+    }
 }

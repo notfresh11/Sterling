@@ -13,12 +13,16 @@
   "license": "MIT",
   "environment": "server",
   "entrypoints": {
+    "preLaunch": [
+      "net.sterling.bridge.SterlingBridgePreLaunch"
+    ],
     "main": [
       "net.sterling.bridge.SterlingBridgeMod"
     ]
   },
   "depends": {
     "fabricloader": ">=0.15.0",
+    "fabric-api": ">=0.163.0",
     "minecraft": ">=26.3",
     "java": ">=25"
   }

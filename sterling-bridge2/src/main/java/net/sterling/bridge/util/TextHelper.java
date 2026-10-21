@@ -4,8 +4,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextHelper {
+    private static final Pattern URI_PATTERN = Pattern.compile("(?:https?|sterling)://\\S+");
+    private static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("&([0-9a-fk-or])", Pattern.CASE_INSENSITIVE);
 
     public static String replacePlaceholders(String text, Map<String, String> placeholders) {
         if (text == null || placeholders == null) {
@@ -28,8 +32,20 @@ public class TextHelper {
             return Component.empty();
         }
 
-        String legacy = input.replace('&', '§');
-        MutableComponent component = Component.literal(legacy);
+        StringBuilder legacy = new StringBuilder(input.length());
+        Matcher uriMatcher = URI_PATTERN.matcher(input);
+        int offset = 0;
+        while (uriMatcher.find()) {
+            legacy.append(convertLegacyColors(input.substring(offset, uriMatcher.start())));
+            legacy.append(uriMatcher.group());
+            offset = uriMatcher.end();
+        }
+        legacy.append(convertLegacyColors(input.substring(offset)));
+        MutableComponent component = Component.literal(legacy.toString());
         return component;
+    }
+
+    private static String convertLegacyColors(String text) {
+        return LEGACY_COLOR_PATTERN.matcher(text).replaceAll("§$1");
     }
 }
