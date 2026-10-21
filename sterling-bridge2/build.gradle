@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'fabric-loom' version '1.19.2'
+}
+
+version = '1.0.0'
+group = 'net.sterling.bridge'
+
+base {
+    archivesName = 'sterling-bridge2'
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:26.3'
+
+    mappings "net.fabricmc:yarn:1.21.4+build.8:v2"
+
+    modImplementation 'net.fabricmc:fabric-loader:0.16.10'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.164.0+26.3'
+
+    include implementation('com.google.code.gson:gson:2.10.1')
+    include implementation('org.yaml:snakeyaml:2.2')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    sourceCompatibility = JavaVersion.toVersion(25)
+    targetCompatibility = JavaVersion.toVersion(25)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 25
+}
+
+test {
+    useJUnitPlatform()
+}
