@@ -49,7 +49,7 @@ public class SterlingBridgeMod implements ModInitializer {
 
         // Event Handlers
         PlayerJoinHandler joinHandler = new PlayerJoinHandler(config);
-        joinHandler.register();
+        joinHandler.register(); // Registered PlayerJoinHandler for ServerPlayConnectionEvents.JOIN (MC 26.3)
 
         // Admin Command (/sterling reload, /sterling sync, /sterling status)
         SterlingCommand command = new SterlingCommand(config, manifestGenerator, configPath);
