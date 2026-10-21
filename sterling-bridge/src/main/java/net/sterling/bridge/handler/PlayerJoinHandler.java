@@ -1,6 +1,10 @@
 package net.sterling.bridge.handler;
 
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.sterling.bridge.config.SterlingConfig;
 import net.sterling.bridge.util.TextHelper;
 import org.slf4j.Logger;
@@ -15,22 +19,8 @@ public class PlayerJoinHandler {
     }
 
     public void register() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            Object player = null;
-            if (handler != null) {
-                try {
-                    player = handler.getClass().getMethod("getPlayer").invoke(handler);
-                } catch (Exception e1) {
-                    try {
-                        player = handler.getClass().getField("player").get(handler);
-                    } catch (Exception e2) {
-                        try {
-                            player = handler.getClass().getMethod("player").invoke(handler);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-            }
+        ServerPlayConnectionEvents.JOIN.register((ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) -> {
+            ServerPlayerEntity player = handler.player;
             String playerName = getPlayerName(player);
 
             // Perform client/brand check or sterling handshake verification
