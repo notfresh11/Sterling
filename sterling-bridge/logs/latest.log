@@ -1,7 +1,7 @@
-[12:50:21] [Test worker/WARN]: Mods directory does not exist at: /tmp/junit6991317363288600410/mods
-[12:50:21] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit6991317363288600410/manifest.json
-[12:50:21] [Test worker/WARN]: Mods directory does not exist at: /tmp/junit6991317363288600410/mods
-[12:50:21] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit6991317363288600410/manifest.json
-[12:50:21] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit8083490983504931163/manifest.json
-[12:50:21] [Test worker/INFO]: Sterling Bridge Embedded HTTP Server started on port 8089
-[12:50:21] [Test worker/INFO]: Sterling Bridge Embedded HTTP Server stopped.
+[07:11:09] [Test worker/WARN]: Mods directory does not exist at: /tmp/junit7210964484406615888/mods
+[07:11:09] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit7210964484406615888/manifest.json
+[07:11:09] [Test worker/WARN]: Mods directory does not exist at: /tmp/junit7210964484406615888/mods
+[07:11:09] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit7210964484406615888/manifest.json
+[07:11:10] [Test worker/INFO]: Successfully saved manifest.json to /tmp/junit15142884296388551781/manifest.json
+[07:11:10] [Test worker/INFO]: Sterling Bridge Embedded HTTP Server started on port 8089
+[07:11:10] [Test worker/INFO]: Sterling Bridge Embedded HTTP Server stopped.
