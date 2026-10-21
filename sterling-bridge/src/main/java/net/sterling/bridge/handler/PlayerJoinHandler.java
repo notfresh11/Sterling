@@ -1,7 +1,6 @@
 package net.sterling.bridge.handler;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.sterling.bridge.config.SterlingConfig;
 import net.sterling.bridge.util.TextHelper;
 import org.slf4j.Logger;
@@ -16,12 +15,20 @@ public class PlayerJoinHandler {
     }
 
     public void register() {
-        ServerPlayConnectionEvents.JOIN.register((ServerPlayNetworkHandler handler, Object sender, Object server) -> {
-            Object player = handler.player;
-            if (player == null) {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            Object player = null;
+            if (handler != null) {
                 try {
                     player = handler.getClass().getMethod("getPlayer").invoke(handler);
-                } catch (Exception ignored) {
+                } catch (Exception e1) {
+                    try {
+                        player = handler.getClass().getField("player").get(handler);
+                    } catch (Exception e2) {
+                        try {
+                            player = handler.getClass().getMethod("player").invoke(handler);
+                        } catch (Exception ignored) {
+                        }
+                    }
                 }
             }
             String playerName = getPlayerName(player);
